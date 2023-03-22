@@ -1,28 +1,16 @@
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import React, { ChangeEvent, FormEvent } from 'react';
-import { TextField } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+
+const BASE_API_ROUTE = 'http://localhost:3000/api';
+const CREATE_OPPORTUNITY_API = `${BASE_API_ROUTE}/opportunity`;
 
 interface FormValues {
   description: string;
   supply: string;
 }
 
-const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginTop: '2rem',
-  },
-  input: {
-    marginBottom: '1rem',
-  },
-});
-
 export default function Form() {
-  const classes = useStyles();
-
   const [formValues, setFormValues] = React.useState<FormValues>({
     description: '',
     supply: '',
@@ -39,23 +27,46 @@ export default function Form() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
 
-    console.log('Form Values: ', formValues);
+    fetch(CREATE_OPPORTUNITY_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        description: formValues?.description,
+        supply: formValues?.supply,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log('created opportunity: ', data));
   };
 
   return (
-    <form onSubmit={handleSubmit} className={classes?.root}>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginTop: '2rem',
+      }}
+    >
       <TextField
+        style={{
+          marginBottom: '1rem',
+        }}
         label="Description"
         variant="outlined"
-        className={classes.input}
         name="description"
         value={formValues.description}
         onChange={handleInputChange}
       />
       <TextField
+        style={{
+          marginBottom: '1rem',
+        }}
         label="Supply"
         variant="outlined"
-        className={classes.input}
         name="supply"
         value={formValues.supply}
         onChange={handleInputChange}
